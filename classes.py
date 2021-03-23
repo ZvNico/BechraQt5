@@ -48,7 +48,7 @@ class CoffreNum(QMainWindow):
             button = QPushButton(str(num))
             self.clavier.append(button)
             button.clicked.connect(self.numkeydown)
-            self.layout.addWidget(button, 1 if i >= 5 else 0, i - (5 * (1 if i >= 5 else 0)), Qt.AlignmentFlag.AlignCenter)
+            self.layout.addWidget(button, 1 if i >= 5 else 0, i - (5 * (1 if i >= 5 else 0)))
 
         self.ouvrir = QPushButton('Ouvrir !')
         self.ouvrir.clicked.connect(self.openmsg)
