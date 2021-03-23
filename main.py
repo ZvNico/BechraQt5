@@ -1,7 +1,11 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QCoreApplication
+from CoffreNum import CoffreNum
 
-app = QApplication(sys.argv)
-window = QWidget()
-window.show()  # IMPORTANT! Les fenêtres sont invisibles sinon
-app.exec_()
+if __name__ == '__main__':
+    app = QCoreApplication.instance()
+    app = QApplication(sys.argv)
+    window = CoffreNum()
+    window.show()
+    app.exec_()
