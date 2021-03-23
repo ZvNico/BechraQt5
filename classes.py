@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QMainWindow, QGridLayout, QPushButton, QMessageBox
 from PyQt5.QtCore import Qt
+from random import randint
 
 
 class Message(QMessageBox):
@@ -21,30 +22,75 @@ class Message(QMessageBox):
         self.close()
 
 
-class ClavierNum(QMainWindow):
+class CoffreNum(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.code = [1, 2, 4, 5]
+        self.code = []
+        temp = 0
+        for i in range(4):
+            num = randint(temp, 6 + i)
+            self.code.append(num)
+            temp = num
+
         self.input = []
         self.msg = "salut à tous les amis, vos grands mères les tricératops !"
-        self.setWindowTitle("Coffre numérique")
+        self.setWindowTitle("Coffre Numérique")
+        self.codevalide = False
+
         self.layout = QGridLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
-        self.buttons = []
-        for i in range(10):
-            self.buttons.append(QPushButton(str(i)))
-            self.buttons[i].connect(lambda x: self.numkeydown(i))
-            self.layout.addWidget(self.buttons[i], 1 if i >= 5 else 0, i - (5 * (1 if i >= 5 else 0)), Qt.AlignmentFlag.AlignCenter)
-        self.buttons.append(QPushButton('Ouvrir !'))
-        self.buttons[-1].clicked.connect(self.openmsg)
-        self.widget = QWidget()
-        self.widget.setLayout(self.layout)
-        self.setCentralWidget(self.widget)
-        self.layout.addWidget(self.buttons[-1], 2, 0, 2, 5)
 
-    def numkeydown(self, i):
-        print(i)
+        self.clavier = []
+        nums = [i for i in range(10)]
+        for i in range(10):
+            num = nums.pop(randint(0, len(nums) - 1))
+            button = QPushButton(str(num))
+            self.clavier.append(button)
+            button.clicked.connect(self.numkeydown)
+            self.layout.addWidget(button, 1 if i >= 5 else 0, i - (5 * (1 if i >= 5 else 0)), Qt.AlignmentFlag.AlignCenter)
+
+        self.ouvrir = QPushButton('Ouvrir !')
+        self.ouvrir.clicked.connect(self.openmsg)
+        p = self.ouvrir.palette()
+        p.setColor(self.ouvrir.backgroundRole(), Qt.green)
+        self.ouvrir.setPalette(p)
+        self.layout.addWidget(self.ouvrir, 2, 0, 2, 5)
+
+        self.widget = QWidget()
+        self.setCentralWidget(self.widget)
+        self.widget.setLayout(self.layout)
+
+        print(self.code)
+
+    def numkeydown(self):
+        button = self.sender()
+        self.input.append(int(button.text()))
+
+        if len(self.input) >= 4:
+            if len(self.input) > 4: del self.input[0]
+
+            # vérification du code, algo avec une complexité exponentielle mais la dimension est fixe donc c'est négligeable
+            # remarque : cela aurait été plus optimisé et propre de le faire dans une fonction dédié mais on a préferer centraliser
+            temp = []
+            for i in range(4):
+                trouver = False
+                for j in range(4):
+                    if j not in temp:
+                        if self.input[i] == self.code[j]:
+                            temp.append(j)
+                            trouver = True
+                            break
+                if not trouver:
+                    break
+
+            if len(temp) == 4:
+                self.codevalide = True
+                self.ouvrir.setAutoFillBackground(True)
+            else:
+                self.codevalide = False
+                self.ouvrir.setAutoFillBackground(False)
 
     def openmsg(self):
-        Message(self, self.msg)
+        if self.codevalide:
+            Message(self, self.msg)
